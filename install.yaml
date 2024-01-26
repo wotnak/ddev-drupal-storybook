@@ -1,0 +1,7 @@
+name: ddev-drupal-storybook
+
+project_files:
+- config.storybook.yaml
+- nginx/drupal-cors.conf
+- commands/web/storybook
+- storybook/

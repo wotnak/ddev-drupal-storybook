@@ -1,0 +1,16 @@
+#ddev-generated
+
+# Expose storybook outside web container.
+web_extra_exposed_ports:
+  - name: Storybook
+    container_port: 6006
+    http_port: 6007
+    https_port: 6006
+
+hooks:
+  post-start:
+    # Make sure corepack is enabled so modern yarn versions can be used.
+    - exec: corepack enable
+    # Copy supervisor config for storybook related processes.
+    - exec: sudo cp -f /mnt/ddev_config/storybook/supervisor/* /etc/supervisor/conf.d/
+    - exec: supervisorctl reload
