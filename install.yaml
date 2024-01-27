@@ -5,3 +5,12 @@ project_files:
 - nginx/drupal-cors.conf
 - commands/web/storybook
 - storybook/
+
+pre_install_actions:
+- |
+  #ddev-nodisplay
+  #ddev-description:Check project type is drupal9 or drupal10
+  if ! ( ddev debug configyaml | grep "drupal9\|drupal10" ); then
+    echo "This addon works only on drupal projects.";
+    exit 1;
+  fi
