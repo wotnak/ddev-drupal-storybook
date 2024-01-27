@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 
 ## #ddev-generated
 ## Description: Start storybook server or init its configuration for use with drupal/storybook module.
