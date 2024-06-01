@@ -9,8 +9,8 @@ project_files:
 pre_install_actions:
 - |
   #ddev-nodisplay
-  #ddev-description:Check project type is drupal9 or drupal10
-  if ! ( ddev debug configyaml | grep "drupal9\|drupal10" ); then
+  #ddev-description:Check project type is drupal
+  if ! ( ddev debug configyaml | grep "type: drupal" ); then
     echo "This addon works only on drupal projects.";
     exit 1;
   fi
