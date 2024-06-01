@@ -52,10 +52,6 @@ statusStorybook() {
   exit
 }
 
-if [ $# -eq 0 ] ; then
-  startStorybook
-fi
-
 case "$1" in
   init)
     initStorybook
