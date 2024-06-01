@@ -1,5 +1,8 @@
 #ddev-generated
 
+# Enable corepack so modern yarn versions can be used.
+corepack_enable: true
+
 # Expose storybook outside web container.
 web_extra_exposed_ports:
   - name: Storybook
@@ -9,7 +12,7 @@ web_extra_exposed_ports:
 
 hooks:
   post-start:
-    # Make sure corepack is enabled so modern yarn versions can be used.
+    # Make sure corepack is enabled on older DDEV versions (<1.23.0).
     - exec: corepack enable
     # Copy supervisor config for storybook related processes.
     - exec: sudo cp -f /mnt/ddev_config/storybook/supervisor/* /etc/supervisor/conf.d/
