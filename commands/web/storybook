@@ -4,49 +4,69 @@ set -eu
 ## #ddev-generated
 ## Description: Start storybook server or init its configuration for use with drupal/storybook module.
 ## Usage: storybook [args]
-## Example: "ddev storybook init" or "ddev storybook start"
+## AutocompleteTerms: ["init","start","stop","status"]
+## Example: storybook start
+## ProjectTypes: drupal9,drupal10,drupal
 
 initStorybook() {
+  echo "Initializing Storybook..."
   if [ -f package.json ] && grep -q storybook package.json; then
     echo "Storybook seems to be already initialized. (package.json contains 'storybook')"
     exit
   fi
+  echo "  installing storybook..."
   touch yarn.lock
   yarn set version stable
   yarn config set nodeLinker node-modules
   # use ci mode to skip storybook automatically starting after install
   CI=true YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn dlx storybook@latest init --type server
+  echo "  configuring storybook..."
   # remove example stories generated during initialization
   rm -rf stories
   # update example stories paths to drupal specific ones
   sed -i 's/"\.\.\/stories\/\*\*\/\*\.mdx", "\.\.\/stories\/\*\*\/\*\.stories\.@(json|yaml|yml)"/"\.\.\/web\/(modules|themes)\/\*\*\/components\/\*\*\/\*\.stories\.json"/' .storybook/main.js
+  echo "  installing drupal/storybook..."
   composer req drupal/storybook
   drush en storybook
   drush role:perm:add anonymous 'render storybook stories'
+  echo "Storybook initialized. For more informaction on writing stories see https://git.drupalcode.org/project/storybook#creating-stories"
   exit
 }
 
 startStorybook() {
+  echo "Starting Storybook..."
   if [ ! -f package.json ] || ! grep -q storybook package.json; then
     echo "Storybook seems to not be installed. Run "ddev storybook init" to install it."
     exit
   fi
+  echo "  enabling drupal twig dev mode..."
   drush state:set twig_debug 1 --input-format=integer
   drush state:set twig_cache_disable 1 --input-format=integer
   drush state:set disable_rendered_output_cache_bins 1 --input-format=integer
+  echo "  making sure anonymous users can see storybook stories..."
+  drush role:perm:add anonymous 'render storybook stories'
+  echo "  rebuilding drupal cache..."
   drush cache:rebuild
+  echo "  starting drupal/storybook stories generation.."
   supervisorctl start storybook-generate-all-stories
+  echo "  starting storybook server..."
   supervisorctl start storybook
+  echo "Storybook started."
   exit
 }
 
 stopStorybook() {
+  echo "Stopping Storybook..."
+  echo "  stopping drupal/storybook stories generation..."
   supervisorctl stop storybook-generate-all-stories
+  echo "  stopping storybook server..."
   supervisorctl stop storybook
+  echo "Storybook stopped."
   exit
 }
 
 statusStorybook() {
+  echo "Storybook status:"
   supervisorctl status storybook-generate-all-stories
   supervisorctl status storybook
   exit
