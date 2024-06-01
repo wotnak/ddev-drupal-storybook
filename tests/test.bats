@@ -9,7 +9,9 @@ setup() {
   cd "${TESTDIR}"
   # Configure and start drupal project.
   ddev config --project-name=${PROJNAME} --project-type=drupal10 --docroot=web --create-docroot
-  ddev composer create drupal/recommended-project
+  ddev start
+  ddev composer create drupal/recommended-project:^10
+  ddev config --update
   ddev composer require drush/drush
   ddev composer config minimum-stability dev
   ddev drush site:install --account-name=admin --account-pass=admin -y
